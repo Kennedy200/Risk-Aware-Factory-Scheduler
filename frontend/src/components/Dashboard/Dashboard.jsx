@@ -7,7 +7,7 @@ import {
   BarChart3
 } from 'lucide-react';
 import UploadCSV from '../UploadCSV';
-import { createSchedule } from '../../api';
+import { createSchedule } from '../../api.js';
 import styles from './Dashboard.module.css';
 
 const Dashboard = ({ onBack }) => {

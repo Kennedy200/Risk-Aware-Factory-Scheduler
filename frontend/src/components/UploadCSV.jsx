@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UploadCloud, FileText, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
-import { uploadCSV } from '../../api';
+import { uploadCSV } from '../api';
 import styles from './UploadCSV.module.css';
 
 const UploadCSV = ({ onUploadComplete }) => {
