@@ -25,11 +25,10 @@ class DurationPredictor:
             model_path: Path to saved model file
         """
         if model_path is None:
-            # Get absolute path to model
+            # Get the backend directory (parent of app)
             current_file = os.path.abspath(__file__)
-            # backend/app/ml/predictor.py -> go up 4 levels to project root
-            project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(current_file))))
-            model_path = os.path.join(project_root, 'ml-data', 'models', 'duration_predictor.pkl')
+            backend_dir = os.path.dirname(os.path.dirname(os.path.dirname(current_file)))
+            model_path = os.path.join(backend_dir, 'ml-data', 'models', 'duration_predictor.pkl')
         
         self.model_path = model_path
         self.model = None
