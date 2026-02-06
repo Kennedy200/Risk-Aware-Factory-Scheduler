@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UploadCloud, FileText, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { uploadCSV } from '../../api';
 import styles from './UploadCSV.module.css';
 
 const UploadCSV = ({ onUploadComplete }) => {
@@ -47,22 +48,14 @@ const UploadCSV = ({ onUploadComplete }) => {
         if (!file) return;
         setStatus('uploading');
 
-        // Simulate API call for UI testing (Replace with real API later)
-        setTimeout(() => {
-            setStatus('success');
-            if (onUploadComplete) onUploadComplete(file);
-        }, 1500);
-        
-        // REAL API CODE (Uncomment when backend is ready):
-        /*
         try {
-            await api.uploadTasks(file);
+            const result = await uploadCSV(file);
             setStatus('success');
-            onUploadComplete();
+            if (onUploadComplete) onUploadComplete(result.tasks);
         } catch (err) {
             setStatus('error');
+            console.error('Upload failed:', err);
         }
-        */
     };
 
     return (
