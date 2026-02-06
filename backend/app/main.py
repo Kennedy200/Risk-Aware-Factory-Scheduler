@@ -35,12 +35,12 @@ app = FastAPI(
 )
 
 # --- CONFIGURE CORS FOR PRODUCTION ---
-# We include "*" to ensure that your Vercel preview URLs don't get blocked.
+# 1. Removed trailing slashes (CORS origins must be exact)
+# 2. Removed "*" wildcard because it conflicts with allow_credentials=True
 origins = [
     "http://localhost:5173",
     "http://localhost:3000",
-    "https://risk-aware-factory-scheduler.vercel.app/",
-    "*" # Highly recommended for the 24h deadline to prevent CORS blocking
+    "https://risk-aware-factory-scheduler.vercel.app" 
 ]
 
 app.add_middleware(
@@ -51,7 +51,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
+# Include routers with the /api prefix
 app.include_router(upload_router, prefix="/api")
 app.include_router(schedule_router, prefix="/api")
 
@@ -71,7 +71,6 @@ async def root():
 async def startup_event():
     """Initialize system resources on startup."""
     # Ensure directories exist for ML models and data
-    # Using absolute paths to avoid issues on cloud containers
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     ml_raw = os.path.join(base_dir, "ml-data", "raw")
     ml_models = os.path.join(base_dir, "ml-data", "models")
@@ -90,7 +89,7 @@ async def startup_event():
 
 
 if __name__ == "__main__":
-    # Render provides a PORT environment variable. We must use it.
+    # Render provides a PORT environment variable.
     port = int(os.environ.get("PORT", 8000))
     import uvicorn
     # In production, uvicorn needs the string import path
