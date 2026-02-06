@@ -39,7 +39,7 @@ app = FastAPI(
 origins = [
     "http://localhost:5173",
     "http://localhost:3000",
-    "https://plan-scheduler.vercel.app",
+    "https://risk-aware-factory-scheduler.vercel.app/",
     "*" # Highly recommended for the 24h deadline to prevent CORS blocking
 ]
 
