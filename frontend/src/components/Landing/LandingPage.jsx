@@ -4,14 +4,14 @@ import { ChevronRight, Database, BrainCircuit, ShieldAlert } from 'lucide-react'
 import GraphBackground from './GraphBackground';
 import styles from './Landing.module.css';
 
-const LandingPage = ({ onStart }) => {
+const LandingPage = ({ onStart, onViewArch }) => {
   return (
     <div className={styles.wrapper}>
-      {/* 1. The D3 Animation Layer */}
+      {/* 1. The D3 Animation Layer (Floating Neural Network) */}
       <GraphBackground />
 
       <div className={styles.contentContainer}>
-        {/* 2. Navigation */}
+        {/* 2. Navigation Header */}
         <nav className={styles.nav}>
           <div className={styles.logo}>CORE<span>PLAN</span>.AI</div>
           <button className={styles.loginBtn}>Access Node</button>
@@ -33,17 +33,20 @@ const LandingPage = ({ onStart }) => {
             </p>
 
             <div className={styles.ctaGroup}>
+              {/* Primary Action: Dashboard */}
               <button onClick={onStart} className={styles.primaryBtn}>
-                Initialize System <ChevronRight />
+                Initialize System <ChevronRight size={20} />
               </button>
-              <button className={styles.secondaryBtn}>
+              
+              {/* Secondary Action: Architecture View */}
+              <button onClick={onViewArch} className={styles.secondaryBtn}>
                 View Architecture
               </button>
             </div>
           </motion.div>
         </header>
 
-        {/* 4. Feature Cards (Glassmorphism) */}
+        {/* 4. Feature Cards (Glassmorphism & D3 Reactive) */}
         <section className={styles.features}>
           <FeatureCard 
             icon={<BrainCircuit size={40} color="#3b82f6" />}
@@ -66,12 +69,22 @@ const LandingPage = ({ onStart }) => {
   );
 };
 
+/**
+ * Reusable Animated Feature Card
+ */
 const FeatureCard = ({ icon, title, desc }) => (
   <motion.div 
-    whileHover={{ scale: 1.02 }}
+    whileHover={{ 
+        scale: 1.05, 
+        backgroundColor: "rgba(30, 41, 59, 0.6)",
+        borderColor: "rgba(59, 130, 246, 0.5)"
+    }}
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
     className={styles.card}
   >
-    {icon}
+    <div className={styles.cardIcon}>{icon}</div>
     <h3>{title}</h3>
     <p>{desc}</p>
   </motion.div>
