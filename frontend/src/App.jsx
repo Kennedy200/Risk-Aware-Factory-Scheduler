@@ -1,21 +1,17 @@
 import React, { useState } from "react";
 import LandingPage from "./components/Landing/LandingPage";
-// import Dashboard from "./components/Dashboard/Dashboard"; // We will rebuild Dashboard using the new components next
-import styles from "./App.module.css";
+import Dashboard from "./components/Dashboard/Dashboard"; // Import the real Dashboard
+import styles from "./App.module.css"; // Ensure this exists (we created it earlier)
 
 function App() {
   const [view, setView] = useState("landing");
 
   return (
-    <div style={{ backgroundColor: '#020617', minHeight: '100vh' }}>
+    <div className={styles.wrapper}>
       {view === "landing" ? (
         <LandingPage onStart={() => setView("dashboard")} />
       ) : (
-        <div style={{color: 'white', padding: 50}}>
-           <h1>Dashboard Under Construction</h1>
-           <p>Integrating Backend Dev's WaveGantt & UploadCSV...</p>
-           <button onClick={() => setView('landing')}>Back</button>
-        </div>
+        <Dashboard onBack={() => setView("landing")} />
       )}
     </div>
   );
