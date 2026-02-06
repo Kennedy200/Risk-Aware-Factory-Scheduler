@@ -31,6 +31,7 @@ const Dashboard = ({ onBack }) => {
   };
 
   const handleRunScheduler = async () => {
+    console.log('Run scheduler clicked, tasks:', tasks.length);
     if (tasks.length === 0) {
       setError('Please upload tasks first');
       return;
@@ -40,10 +41,13 @@ const Dashboard = ({ onBack }) => {
     setError(null);
 
     try {
+      console.log('Calling createSchedule with tasks:', tasks);
       const result = await createSchedule(tasks);
+      console.log('Schedule result:', result);
       setPlan(result);
       setActiveTab('schedule');
     } catch (err) {
+      console.error('Schedule error:', err);
       setError(err.message || 'Failed to generate schedule');
     } finally {
       setIsScheduling(false);
@@ -97,6 +101,14 @@ const Dashboard = ({ onBack }) => {
 
       {/* --- MAIN CONTENT --- */}
       <main className={styles.content} style={{ marginLeft: collapsed ? 80 : 280 }}>
+        {error && (
+          <div className={styles.errorBanner}>
+            <AlertTriangle size={18} />
+            <span>{error}</span>
+            <button onClick={() => setError(null)}>×</button>
+          </div>
+        )}
+
         <header className={styles.contentHeader}>
           <div className={styles.headerTitle}>
             <motion.h1 
