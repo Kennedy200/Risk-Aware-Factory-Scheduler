@@ -1,0 +1,1 @@
+export default function WaveGantt() { return <div>Gantt Component</div> }
