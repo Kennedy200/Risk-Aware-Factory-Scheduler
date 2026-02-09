@@ -51,9 +51,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers with the /api prefix
-app.include_router(upload_router, prefix="/api")
-app.include_router(schedule_router, prefix="/api")
+# Include routers (they already have /api prefix)
+app.include_router(upload_router)
+app.include_router(schedule_router)
 
 
 @app.get("/")
