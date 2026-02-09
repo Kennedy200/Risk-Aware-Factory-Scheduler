@@ -8,6 +8,7 @@ const UploadCSV = ({ onUploadComplete }) => {
     const [dragActive, setDragActive] = useState(false);
     const [file, setFile] = useState(null);
     const [status, setStatus] = useState('idle'); // idle, uploading, success, error
+    const [errorMsg, setErrorMsg] = useState('');
     const inputRef = useRef(null);
 
     const handleDrag = (e) => {
@@ -36,26 +37,27 @@ const UploadCSV = ({ onUploadComplete }) => {
     };
 
     const handleFile = (selectedFile) => {
-        console.log('Selected file:', selectedFile.name, 'Type:', selectedFile.type);
-        
-        // Reset error state
+        // Clear any previous error
         setStatus('idle');
+        setErrorMsg('');
         
-        // Check file extension - more reliable than MIME type
+        // Check file extension
         const fileName = selectedFile.name.toLowerCase();
         if (!fileName.endsWith('.csv')) {
-            console.log('File rejected - not a CSV');
             setStatus('error');
+            setErrorMsg('Invalid format. CSV required.');
+            setFile(null);
             return;
         }
         
-        console.log('File accepted');
+        // Valid file
         setFile(selectedFile);
     };
 
     const uploadFile = async () => {
         if (!file) return;
         setStatus('uploading');
+        setErrorMsg('');
 
         try {
             const result = await uploadCSV(file);
@@ -63,8 +65,15 @@ const UploadCSV = ({ onUploadComplete }) => {
             if (onUploadComplete) onUploadComplete(result.tasks);
         } catch (err) {
             setStatus('error');
+            setErrorMsg(err.message || 'Upload failed. Please try again.');
             console.error('Upload failed:', err);
         }
+    };
+
+    const reset = () => {
+        setFile(null);
+        setStatus('idle');
+        setErrorMsg('');
     };
 
     return (
@@ -79,7 +88,7 @@ const UploadCSV = ({ onUploadComplete }) => {
                         <CheckCircle size={50} className={styles.iconSuccess} />
                         <h3>Data Ingested</h3>
                         <p>GraphPlan Engine is ready to process.</p>
-                        <button onClick={() => { setFile(null); setStatus('idle'); }} className={styles.resetBtn}>
+                        <button onClick={reset} className={styles.resetBtn}>
                             Upload New Dataset
                         </button>
                     </motion.div>
@@ -109,7 +118,7 @@ const UploadCSV = ({ onUploadComplete }) => {
                                 </div>
                                 <h3>Initialize Data Stream</h3>
                                 <p>Drag & Drop CSV or <span>Click to Browse</span></p>
-                                <div className={styles.supported}>Supported: factory_tasks.csv</div>
+                                <div className={styles.supported}>Supported: .csv files</div>
                             </div>
                         ) : (
                             <div className={styles.fileSelected}>
@@ -125,16 +134,16 @@ const UploadCSV = ({ onUploadComplete }) => {
                                     </div>
                                 ) : (
                                     <div className={styles.actions}>
-                                        <button onClick={() => setFile(null)} className={styles.cancelBtn}>Cancel</button>
-                                        <button onClick={uploadFile} className={styles.uploadBtn}>Upload to Core</button>
+                                        <button type="button" onClick={reset} className={styles.cancelBtn}>Cancel</button>
+                                        <button type="button" onClick={uploadFile} className={styles.uploadBtn}>Upload to Core</button>
                                     </div>
                                 )}
                             </div>
                         )}
                         
-                        {status === 'error' && (
+                        {status === 'error' && errorMsg && (
                             <div className={styles.errorMsg}>
-                                <AlertCircle size={16} /> Invalid format. CSV required.
+                                <AlertCircle size={16} /> {errorMsg}
                             </div>
                         )}
                     </motion.form>
