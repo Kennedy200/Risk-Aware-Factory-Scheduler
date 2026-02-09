@@ -36,7 +36,8 @@ const UploadCSV = ({ onUploadComplete }) => {
     };
 
     const handleFile = (selectedFile) => {
-        if (selectedFile.type !== "text/csv" && !selectedFile.name.endsWith('.csv')) {
+        // Check file extension - more reliable than MIME type
+        if (!selectedFile.name.toLowerCase().endsWith('.csv')) {
             setStatus('error');
             return;
         }
