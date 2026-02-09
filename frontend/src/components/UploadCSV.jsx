@@ -36,13 +36,21 @@ const UploadCSV = ({ onUploadComplete }) => {
     };
 
     const handleFile = (selectedFile) => {
+        console.log('Selected file:', selectedFile.name, 'Type:', selectedFile.type);
+        
+        // Reset error state
+        setStatus('idle');
+        
         // Check file extension - more reliable than MIME type
-        if (!selectedFile.name.toLowerCase().endsWith('.csv')) {
+        const fileName = selectedFile.name.toLowerCase();
+        if (!fileName.endsWith('.csv')) {
+            console.log('File rejected - not a CSV');
             setStatus('error');
             return;
         }
+        
+        console.log('File accepted');
         setFile(selectedFile);
-        setStatus('idle');
     };
 
     const uploadFile = async () => {

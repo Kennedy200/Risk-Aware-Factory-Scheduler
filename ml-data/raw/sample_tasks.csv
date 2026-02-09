@@ -1,0 +1,7 @@
+task_id,duration,deadline,predecessors,resource_cpu,resource_person
+A,60,240,,1,1
+B,30,240,A,1,1
+C,60,300,A,2,1
+D,45,300,B,1,2
+E,30,360,C,1,1
+F,50,360,D,E,2,2
