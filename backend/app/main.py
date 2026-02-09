@@ -6,10 +6,16 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
-from .api.routes.upload import router as upload_router
-from .api.routes.schedule import router as schedule_router
-from .db.database import init_db
-
+# Updated imports to ensure they work correctly in the deployed environment
+try:
+    from .api.routes.upload import router as upload_router
+    from .api.routes.schedule import router as schedule_router
+    from .db.database import init_db
+except ImportError:
+    # Fallback for different execution contexts in production
+    from api.routes.upload import router as upload_router
+    from api.routes.schedule import router as schedule_router
+    from db.database import init_db
 
 # Create FastAPI app
 app = FastAPI(
@@ -28,11 +34,13 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# Configure CORS
+# --- CONFIGURE CORS FOR PRODUCTION ---
+# 1. Removed trailing slashes (CORS origins must be exact)
+# 2. Removed "*" wildcard because it conflicts with allow_credentials=True
 origins = [
-    "http://localhost:5173",  # Vite dev server
+    "http://localhost:5173",
     "http://localhost:3000",
-    "https://plan-scheduler.vercel.app",  # Production frontend
+    "https://risk-aware-factory-scheduler.vercel.app" 
 ]
 
 app.add_middleware(
@@ -43,36 +51,46 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
-app.include_router(upload_router)
-app.include_router(schedule_router)
+# Include routers with the /api prefix
+app.include_router(upload_router, prefix="/api")
+app.include_router(schedule_router, prefix="/api")
 
 
 @app.get("/")
 async def root():
-    """Root endpoint."""
+    """Root endpoint for Health Check."""
     return {
+        "status": "online",
         "message": "Risk-Aware Task Scheduler API",
-        "docs": "/docs",
-        "version": "1.0.0"
+        "version": "1.0.0",
+        "docs": "/docs"
     }
 
 
 @app.on_event("startup")
 async def startup_event():
-    """Initialize on startup."""
-    # Create ml-data directories if they don't exist
-    os.makedirs("ml-data/raw", exist_ok=True)
-    os.makedirs("ml-data/models", exist_ok=True)
+    """Initialize system resources on startup."""
+    # Ensure directories exist for ML models and data
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    ml_raw = os.path.join(base_dir, "ml-data", "raw")
+    ml_models = os.path.join(base_dir, "ml-data", "models")
+    
+    os.makedirs(ml_raw, exist_ok=True)
+    os.makedirs(ml_models, exist_ok=True)
     
     # Initialize database tables
-    init_db()
-    print("📦 Database initialized")
+    try:
+        init_db()
+        print("📦 Database initialized successfully")
+    except Exception as e:
+        print(f"⚠️ Database init warning: {e}")
     
-    print("🚀 Risk-Aware Task Scheduler API started")
-    print("📚 API docs available at: http://localhost:8000/docs")
+    print("🚀 Risk-Aware Task Scheduler API is now active")
 
 
 if __name__ == "__main__":
+    # Render provides a PORT environment variable.
+    port = int(os.environ.get("PORT", 8000))
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # In production, uvicorn needs the string import path
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
